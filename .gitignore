@@ -153,6 +153,7 @@ dmypy.json
 cython_debug/
 
 # dataset
+.bak
 dataset/
 
 # PyCharm
