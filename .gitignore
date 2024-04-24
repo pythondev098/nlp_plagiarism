@@ -157,7 +157,7 @@ cython_debug/
 dataset/
 env_nlp_plagiarism/
 .txt
-test*.*
+test*.py
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
