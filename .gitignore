@@ -158,6 +158,8 @@ dataset/
 env_nlp_plagiarism/
 .txt
 test*.py
+*.rar
+*.zip
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
