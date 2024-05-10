@@ -1,4 +1,5 @@
 import os
+from itertools import chain
 from tqdm import tqdm
 from sklearn.feature_extraction.text import CountVectorizer
 from nltk.corpus import stopwords
@@ -29,19 +30,27 @@ class Preprocessing:
                                'external-detection-corpus\\source-document'
         suspicious_dir_name_path = 'F:\\workspace\\nlp_plagiarism\\dataset\\pan-plagiarism-corpus-2011\\' \
                                    'external-detection-corpus\\suspicious-document'
-
-        source_output_path = 'F:\\workspace\\nlp_plagiarism\\dataset\\pan-plagiarism-corpus-2011\\' \
-                             'external-detection-corpus\\source_output'
-        suspicious_output_path = 'F:\\workspace\\nlp_plagiarism\\dataset\\pan-plagiarism-corpus-2011\\' \
-                                 'external-detection-corpus\\suspicious_output'
+        unigram_path = 'F:\\workspace\\nlp_plagiarism\\dataset\\pan-plagiarism-corpus-2011\\' \
+                       'external-detection-corpus\\unigram'
+        bigram_path = 'F:\\workspace\\nlp_plagiarism\\dataset\\pan-plagiarism-corpus-2011\\' \
+                      'external-detection-corpus\\bigram'
+        unigram_source_output_path = f'{unigram_path}\\source_output'
+        unigram_suspicious_output_path = f'{unigram_path}\\suspicious_output'
+        bigram_source_output_path = f'{bigram_path}\\source_output'
+        bigram_suspicious_output_path = f'{bigram_path}\\suspicious_output'
 
         self.source_parts_dir_name = os.listdir(source_dir_name_path)
         self.suspicious_parts_dir_name = os.listdir(suspicious_dir_name_path)
 
-        self.preprocessing(self.source_parts_dir_name, source_dir_name_path, source_output_path)
-        self.preprocessing(self.suspicious_parts_dir_name, suspicious_dir_name_path, suspicious_output_path)
+        self.preprocessing(self.source_parts_dir_name, source_dir_name_path, unigram_source_output_path, 'unigram')
+        self.preprocessing(self.suspicious_parts_dir_name, suspicious_dir_name_path, unigram_suspicious_output_path,
+                           'unigram')
 
-    def preprocessing(self, dir_name, path, output_folder_path):
+        self.preprocessing(self.source_parts_dir_name, source_dir_name_path, bigram_source_output_path, 'bigram')
+        self.preprocessing(self.suspicious_parts_dir_name, suspicious_dir_name_path, bigram_suspicious_output_path,
+                           'biggram')
+
+    def preprocessing(self, dir_name, path, output_folder_path, n_gram):
         significant_token = []
         for part in tqdm(dir_name):
             print("part : ", part)
@@ -50,13 +59,13 @@ class Preprocessing:
             source_files = [f for f in os.listdir(dir_part_path) if f.endswith('.txt')]
             for file in tqdm(source_files):
                 file_name = f'{path}\\{part}\\{file}'
-                # print(sss)
-                with open(f'{file_name}', 'r', encoding='utf8') as txt_file:
+                with open(f'{file_name}', 'r', encoding='utf-8-sig') as txt_file:
                     text = " ".join(line.rstrip().lower() for line in tqdm(txt_file))
                     # print(text)
                 paragraph = ''
                 name, ext = os.path.splitext(file)
-                new_text_file = open(f'{output_folder_path}\\{name}1.{ext}', "w", encoding='utf8')
+                new_text_file = open(f'{output_folder_path}\\{name}1.{ext}', "w", encoding='utf-8-sig')
+                # bigram_text_file = open(f'{output_folder_path}\\{name}1.{ext}', "w", encoding='utf8')
 
                 word_counter = 0
                 for word in text.split():
@@ -73,8 +82,18 @@ class Preprocessing:
                         # remove punctuations
                         paragraph = paragraph.translate(str.maketrans('', '', string.punctuation))
 
-                        # Tokenizing to unigrams
-                        token_paragraph = word_tokenize(paragraph)
+                        if n_gram == 'unigram':
+                            # Tokenizing to unigrams
+                            token_paragraph = word_tokenize(paragraph)
+                        else:
+                            # Tokenizing to bigram
+                            tokens = nltk.word_tokenize(paragraph)
+                            token_paragraph = list(nltk.bigrams(tokens))
+                            token_paragraph = list(chain.from_iterable(token_paragraph))
+                            res = []
+                            [res.append(x) for x in token_paragraph if x not in res]
+                            # print(res)
+                            token_paragraph = res
 
                         # remove short words
                         long_token_paragraph = [item for item in token_paragraph if len(item) > 2]
@@ -95,10 +114,6 @@ class Preprocessing:
                         # Empty significant_token array
                         significant_token = []
 
-                        # Tokenizing to bigram
-                        bigrm_tokens = nltk.bigrams(token_paragraph)
-                        # print(*map(' '.join, bigrm_tokens), sep=', ')
-
                         # convert token list to string to save in a file
                         token_list_to_string = ' '.join([str(item) for item in lemmatize_token_paragraph])
 
@@ -111,8 +126,3 @@ class Preprocessing:
                         word_counter = 0
 
                 new_text_file.close()
-
-
-
-
-# Preprocessing()

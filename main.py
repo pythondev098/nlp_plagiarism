@@ -8,10 +8,15 @@ def nlp_plagiarism():
 
 def create_output_folders():
     path = 'F:\\workspace\\nlp_plagiarism\\dataset\\pan-plagiarism-corpus-2011\\external-detection-corpus'
-    if not os.path.exists(f'{path}\\source_output'):
-        os.makedirs(f'{path}\\source_output')
-    if not os.path.exists(f'{path}\\suspicious_output'):
-        os.makedirs(f'{path}\\suspicious_output')
+    if not os.path.exists(f'{path}\\unigram\\source_output'):
+        os.makedirs(f'{path}\\unigram\\source_output')
+    if not os.path.exists(f'{path}\\unigram\\suspicious_output'):
+        os.makedirs(f'{path}\\unigram\\suspicious_output')
+
+    if not os.path.exists(f'{path}\\bigram\\source_output'):
+        os.makedirs(f'{path}\\bigram\\source_output')
+    if not os.path.exists(f'{path}\\bigram\\suspicious_output'):
+        os.makedirs(f'{path}\\bigram\\suspicious_output')
 
 
 if __name__ == "__main__":
