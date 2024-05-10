@@ -29,13 +29,21 @@ class Preprocessing:
                                'external-detection-corpus\\source-document'
         suspicious_dir_name_path = 'F:\\workspace\\nlp_plagiarism\\dataset\\pan-plagiarism-corpus-2011\\' \
                                    'external-detection-corpus\\suspicious-document'
-        self.source_parts_dir_name = os.listdir(source_dir_name_path)
-        # suspicious_parts_dir_name = os.listdir(suspicious_dir_name_path)
-        self.preprocessing(source_dir_name_path)
 
-    def preprocessing(self, path):
+        source_output_path = 'F:\\workspace\\nlp_plagiarism\\dataset\\pan-plagiarism-corpus-2011\\' \
+                             'external-detection-corpus\\source_output'
+        suspicious_output_path = 'F:\\workspace\\nlp_plagiarism\\dataset\\pan-plagiarism-corpus-2011\\' \
+                                 'external-detection-corpus\\suspicious_output'
+
+        self.source_parts_dir_name = os.listdir(source_dir_name_path)
+        self.suspicious_parts_dir_name = os.listdir(suspicious_dir_name_path)
+
+        self.preprocessing(self.source_parts_dir_name, source_dir_name_path, source_output_path)
+        self.preprocessing(self.suspicious_parts_dir_name, suspicious_dir_name_path, suspicious_output_path)
+
+    def preprocessing(self, dir_name, path, output_folder_path):
         significant_token = []
-        for part in tqdm(self.source_parts_dir_name):
+        for part in tqdm(dir_name):
             print("part : ", part)
             dir_part_path = f'{path}\\{part}'
             os.chdir(dir_part_path)
@@ -48,7 +56,7 @@ class Preprocessing:
                     # print(text)
                 paragraph = ''
                 name, ext = os.path.splitext(file)
-                new_text_file = open(f'{name}1.{ext}', "w", encoding='utf8')
+                new_text_file = open(f'{output_folder_path}\\{name}1.{ext}', "w", encoding='utf8')
 
                 word_counter = 0
                 for word in text.split():
