@@ -64,8 +64,7 @@ class Preprocessing:
                     # print(text)
                 paragraph = ''
                 name, ext = os.path.splitext(file)
-                new_text_file = open(f'{output_folder_path}\\{name}.{ext}', "w", encoding='utf-8-sig')
-                # bigram_text_file = open(f'{output_folder_path}\\{name}1.{ext}', "w", encoding='utf8')
+                new_text_file = open(f'{output_folder_path}\\{name}{ext}', "w", encoding='utf-8-sig')
 
                 word_counter = 0
                 for word in text.split():

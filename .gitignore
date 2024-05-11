@@ -155,6 +155,7 @@ cython_debug/
 # dataset
 
 dataset/
+test/
 env_nlp_plagiarism/
 *.bak
 *.txt
