@@ -1,0 +1,62 @@
+import os
+# import pandas as pd
+import pandas as pd
+from tqdm import tqdm
+
+
+class Seeding:
+    def __init__(self):
+
+        self.unigram_suspicious_dir_path = 'F:\\workspace\\nlp_plagiarism\\test\\unigram\\suspicious_output'
+        self.unigram_source_dir_path = 'F:\\workspace\\nlp_plagiarism\\test\\unigram\\source_output'
+        self.unigram_source_files = [f for f in os.listdir(self.source_dir_path) if f.endswith('.txt')]
+        self.unigram_suspicious_files = [f for f in os.listdir(self.suspicious_dir_path) if f.endswith('.txt')]
+        self.suspicious_paragraph_number = 0
+        self.source_paragraph_number = 0
+
+        self.unigram_seeding()
+
+    def unigram_seeding(self):
+        print("self.suspicious_files:\n", self.suspicious_files)
+        for suspicious_file_name in tqdm(self.suspicious_files):
+            df_seeding_phase = pd.DataFrame(
+                columns=['suspicious_file_name', 'suspicious_paragraph_number', 'source_file_name',
+                         'source_paragraph_number', 'common_words_number'])
+
+            # file_name = f'{path}\\{part}\\{file}'
+
+            with open(f'{self.suspicious_dir_path}\\{suspicious_file_name}', 'r', encoding='utf-8-sig') as \
+                    suspicious_txt_file:
+
+                self.suspicious_paragraph_number = 0
+                for suspicious_paragraph in suspicious_txt_file:
+
+                    for source_file_name in tqdm(self.source_files):
+                        with open(f'{self.source_dir_path}\\{source_file_name}', 'r', encoding='utf-8-sig') as \
+                                source_txt_file:
+                            for source_paragraph in source_txt_file:
+                                # print(source_paragraph)
+                                # Find common words between suspicious paragraphs and source paragraphs
+                                common_words = set(suspicious_paragraph.split()) & set(source_paragraph.split())
+                                common_words_number = len(common_words)
+                                # create dataframe for paragraph comparison
+                                new_row = {'suspicious_file_name': suspicious_file_name,
+                                           'suspicious_paragraph_number': self.suspicious_paragraph_number,
+                                           'source_file_name': source_file_name,
+                                           'source_paragraph_number': self.source_paragraph_number,
+                                           'common_words_number': common_words_number}
+                                df_seeding_phase = pd.concat([df_seeding_phase, pd.DataFrame([new_row])], axis=0,
+                                                             ignore_index=True)
+
+                                self.source_paragraph_number = self.source_paragraph_number + 1
+
+                        self.source_paragraph_number = 0
+
+                    self.suspicious_paragraph_number = self.suspicious_paragraph_number + 1
+                # save the dataframe in csv file
+                df_seeding_phase.to_csv(f'{suspicious_file_name}.csv', index=False)
+
+
+
+            print(df_seeding_phase.head())
+            print(df_seeding_phase.columns)

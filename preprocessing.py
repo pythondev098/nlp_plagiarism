@@ -26,14 +26,13 @@ class Preprocessing:
         self.i = 0
         self.tags = ['JJ', 'JJR', 'JJS', 'RB', 'RBR', 'RBS', 'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ', 'NN', 'NNS',
                      'NNP', 'NNPS']
-        source_dir_name_path = 'F:\\workspace\\nlp_plagiarism\\dataset\\pan-plagiarism-corpus-2011\\' \
-                               'external-detection-corpus\\source-document'
-        suspicious_dir_name_path = 'F:\\workspace\\nlp_plagiarism\\dataset\\pan-plagiarism-corpus-2011\\' \
-                                   'external-detection-corpus\\suspicious-document'
-        unigram_path = 'F:\\workspace\\nlp_plagiarism\\dataset\\pan-plagiarism-corpus-2011\\' \
-                       'external-detection-corpus\\unigram'
-        bigram_path = 'F:\\workspace\\nlp_plagiarism\\dataset\\pan-plagiarism-corpus-2011\\' \
-                      'external-detection-corpus\\bigram'
+        self.output_path = 'F:\\workspace\\nlp_plagiarism\\dataset\\output'
+        self.source_path = 'F:\\workspace\\nlp_plagiarism\\dataset\\pan-plagiarism-corpus-2011\\' \
+                           'external-detection-corpus'
+        source_dir_name_path = f'{self.source_path}\\source-document'
+        suspicious_dir_name_path = f'{self.source_path}\\suspicious-document'
+        unigram_path = f'{self.output_path}\\unigram'
+        bigram_path = f'{self.output_path}\\bigram'
         unigram_source_output_path = f'{unigram_path}\\source_output'
         unigram_suspicious_output_path = f'{unigram_path}\\suspicious_output'
         bigram_source_output_path = f'{bigram_path}\\source_output'
@@ -48,7 +47,7 @@ class Preprocessing:
 
         self.preprocessing(self.source_parts_dir_name, source_dir_name_path, bigram_source_output_path, 'bigram')
         self.preprocessing(self.suspicious_parts_dir_name, suspicious_dir_name_path, bigram_suspicious_output_path,
-                           'biggram')
+                           'bigram')
 
     def preprocessing(self, dir_name, path, output_folder_path, n_gram):
         significant_token = []
@@ -89,10 +88,23 @@ class Preprocessing:
                             tokens = nltk.word_tokenize(paragraph)
                             token_paragraph = list(nltk.bigrams(tokens))
                             token_paragraph = list(chain.from_iterable(token_paragraph))
-                            res = []
-                            [res.append(x) for x in token_paragraph if x not in res]
-                            # print(res)
-                            token_paragraph = res
+                            # print("token_paragraph:\n", token_paragraph)
+                            # res = token_paragraph.split()
+                            # s = ""
+                            # j = 0
+                            # # printing result
+                            # print("\nThe words of string are")
+                            # for i in res:
+                            #     j += 1
+                            #     s = s + i
+                            #     if j % 2 == 0:
+                            #         s = s + " "
+                            # res = []
+                            # # Removing duplicate tokens
+                            # [res.append(x) for x in token_paragraph if x not in res]
+                            # # print(res)
+                            # token_paragraph = res
+                            # token_paragraph = s
 
                         # remove short words
                         long_token_paragraph = [item for item in token_paragraph if len(item) > 2]
@@ -116,11 +128,27 @@ class Preprocessing:
                         # convert token list to string to save in a file
                         token_list_to_string = ' '.join([str(item) for item in lemmatize_token_paragraph])
 
+                        # #################
+                        if n_gram == 'bigram':
+                            result = token_list_to_string.split()
+                            s = ""
+                            j = 0
+                            # printing result
+                            # print("\nThe words of string are")
+                            for i in result:
+                                j += 1
+                                s = s + i
+                                if j % 2 == 0:
+                                    s = s + " "
+                            token_list_to_string = s
+                        # #################
+
                         # Write tokens to a file
                         new_text_file.write(token_list_to_string)
 
                         # Add two lines to the file after each paragraph
-                        new_text_file.write('\n\n')
+                        new_text_file.write('\n')
+                        # new_text_file.write('\n\n')
                         paragraph = ''
                         word_counter = 0
 
