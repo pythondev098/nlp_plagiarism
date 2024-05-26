@@ -22,38 +22,39 @@ wordnet_lemmatizer = WordNetLemmatizer()
 
 class Preprocessing:
 
-    def __init__(self, training_source_path, test_source_path, training_source_dir_name, test_source_dir_name):
+    def __init__(self):
         self.i = 0
         self.tags = ['JJ', 'JJR', 'JJS', 'RB', 'RBR', 'RBS', 'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ', 'NN', 'NNS',
                      'NNP', 'NNPS']
+        self.output_path = 'F:\\workspace\\nlp_plagiarism\\dataset\\output'
+        self.source_path = 'F:\\workspace\\nlp_plagiarism\\dataset\\pan-plagiarism-corpus-2011\\' \
+                           'external-detection-corpus'
+        source_dir_name_path = f'{self.source_path}\\source-document'
+        suspicious_dir_name_path = f'{self.source_path}\\suspicious-document'
+        unigram_path = f'{self.output_path}\\unigram'
+        bigram_path = f'{self.output_path}\\bigram'
+        unigram_source_output_path = f'{unigram_path}\\source_output'
+        unigram_suspicious_output_path = f'{unigram_path}\\suspicious_output'
+        bigram_source_output_path = f'{bigram_path}\\source_output'
+        bigram_suspicious_output_path = f'{bigram_path}\\suspicious_output'
 
-        self.training_source_path = training_source_path
-        self.test_source_path = test_source_path
+        self.source_parts_dir_name = os.listdir(source_dir_name_path)
+        self.suspicious_parts_dir_name = os.listdir(suspicious_dir_name_path)
 
-        self.training_source_dir_name = training_source_dir_name
-        # print(self.training_source_dir_name)
-        self.test_source_dir_name = test_source_dir_name
-        # print(self.test_source_dir_name)
+        self.preprocessing(self.source_parts_dir_name, source_dir_name_path, unigram_source_output_path, 'unigram')
+        self.preprocessing(self.suspicious_parts_dir_name, suspicious_dir_name_path, unigram_suspicious_output_path,
+                           'unigram')
 
-        self.preprocessing(self.training_source_dir_name, self.training_source_path, 'unigram')
-        self.preprocessing(self.training_source_dir_name, self.training_source_path, 'bigram')
+        self.preprocessing(self.source_parts_dir_name, source_dir_name_path, bigram_source_output_path, 'bigram')
+        self.preprocessing(self.suspicious_parts_dir_name, suspicious_dir_name_path, bigram_suspicious_output_path,
+                           'bigram')
 
-        self.preprocessing(self.test_source_dir_name, self.test_source_path, 'unigram')
-        self.preprocessing(self.test_source_dir_name, self.test_source_path, 'bigram')
-
-    def preprocessing(self, dir_name, path, n_gram):
-
+    def preprocessing(self, dir_name, path, output_folder_path, n_gram):
         significant_token = []
         for part in tqdm(dir_name):
-            if not os.path.exists(f'{path}\\{part}\\{n_gram}\\known'):
-                os.makedirs(f'{path}\\{part}\\{n_gram}\\known')
-            if not os.path.exists(f'{path}\\{part}\\{n_gram}\\unknown'):
-                os.makedirs(f'{path}\\{part}\\{n_gram}\\unknown')
-            known_output_folder_path = f'{path}\\{part}\\{n_gram}\\known'
-            unknown_output_folder_path = f'{path}\\{part}\\{n_gram}\\unknown'
+            print("part : ", part)
             dir_part_path = f'{path}\\{part}'
-            # print("dir_part_path: \n", dir_part_path)
-            # os.chdir(dir_part_path)
+            os.chdir(dir_part_path)
             source_files = [f for f in os.listdir(dir_part_path) if f.endswith('.txt')]
             for file in tqdm(source_files):
                 file_name = f'{path}\\{part}\\{file}'
@@ -62,12 +63,7 @@ class Preprocessing:
                     # print(text)
                 paragraph = ''
                 name, ext = os.path.splitext(file)
-
-                if name[0] == 'k':
-                    new_text_file = open(f'{known_output_folder_path}\\{name}{ext}', "w", encoding='utf-8-sig')
-
-                elif name[0] == 'u':
-                    new_text_file = open(f'{unknown_output_folder_path}\\{name}{ext}', "w", encoding='utf-8-sig')
+                new_text_file = open(f'{output_folder_path}\\{name}{ext}', "w", encoding='utf-8-sig')
 
                 word_counter = 0
                 for word in text.split():
@@ -92,6 +88,23 @@ class Preprocessing:
                             tokens = nltk.word_tokenize(paragraph)
                             token_paragraph = list(nltk.bigrams(tokens))
                             token_paragraph = list(chain.from_iterable(token_paragraph))
+                            # print("token_paragraph:\n", token_paragraph)
+                            # res = token_paragraph.split()
+                            # s = ""
+                            # j = 0
+                            # # printing result
+                            # print("\nThe words of string are")
+                            # for i in res:
+                            #     j += 1
+                            #     s = s + i
+                            #     if j % 2 == 0:
+                            #         s = s + " "
+                            # res = []
+                            # # Removing duplicate tokens
+                            # [res.append(x) for x in token_paragraph if x not in res]
+                            # # print(res)
+                            # token_paragraph = res
+                            # token_paragraph = s
 
                         # remove short words
                         long_token_paragraph = [item for item in token_paragraph if len(item) > 2]
